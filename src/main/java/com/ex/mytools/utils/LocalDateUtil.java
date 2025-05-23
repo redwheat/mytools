@@ -1,7 +1,6 @@
 package com.ex.mytools.utils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
@@ -86,4 +85,57 @@ public class LocalDateUtil {
             return DATE_TIME_FORMATTER_CACHE.get(format);
         }
     }
+
+
+    /**
+     * 获取时间戳(ms), 基于中国标准时间（CST, UTC+8)
+     *
+     * @param localDateTime
+     * @return
+     */
+    public static Long getEpochMilliSecond(LocalDateTime localDateTime) {
+        // 定义 ZoneId 为 Asia/Shanghai，即中国标准时间 (CST)
+        ZoneId zoneIdCst = ZoneId.of("Asia/Shanghai");
+
+        // 将 LocalDateTime 转换为 ZonedDateTime 并设置为北京时间
+        ZonedDateTime zonedDateTimeCst = localDateTime.atZone(zoneIdCst);
+
+        // 将 ZonedDateTime 转换为 Instant
+        Instant instant = zonedDateTimeCst.toInstant();
+
+        // 获取时间戳毫秒数
+        long timestampMillis = instant.toEpochMilli();
+
+        return timestampMillis;
+    }
+
+    /**
+     * 将时间戳(ms)转换为LocalDateTime
+     *
+     * @param timestamp
+     * @return
+     */
+    public static LocalDateTime epochMilliSecondToLocalDateTime(Long timestamp) {
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        ZoneId zoneId = ZoneId.of("Asia/Shanghai");
+        return LocalDateTime.ofInstant(instant, zoneId);
+    }
+
+    public static void main(String[] args) {
+        LocalDateTime time = LocalDateTime.of(2025, 5, 21, 0, 0, 0);
+        LocalDateTime startTime = LocalDateTime.of(2025, 5, 21, 0, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 5, 26, 23, 59, 59);
+
+        boolean f = time.isAfter(startTime) && time.isBefore(endTime);
+        System.out.println(f);
+
+        Long epochMilliSecond = getEpochMilliSecond(time);
+        System.out.println(epochMilliSecond);
+
+        long timestamp = 1747813145331L;
+        LocalDateTime localDateTime = epochMilliSecondToLocalDateTime(timestamp);
+        System.out.println(localDateTime);
+
+    }
+
 }
